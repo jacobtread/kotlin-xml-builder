@@ -63,25 +63,9 @@ open class Node(val nodeName: String) : Element {
         if (!isReflectionAvailable) {
             return@lazy null
         }
-
-        @Suppress("NO_REFLECTION_IN_CLASS_PATH") // Checked for reflection class above
         val xmlTypeAnnotation = this::class.annotations.firstOrNull { it is XmlType } as? XmlType ?: return@lazy null
-
         val childOrder = xmlTypeAnnotation.childOrder
-
         childOrder.indices.associateBy { childOrder[it] }
-    }
-
-
-    private fun <T : Element> initTag(tag: T): T {
-        children.add(tag)
-        return tag
-    }
-
-    private fun <T : Element> initTag(tag: T, init: T.() -> Unit): T {
-        tag.init()
-        children.add(tag)
-        return tag
     }
 
 

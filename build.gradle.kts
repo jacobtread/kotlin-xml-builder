@@ -1,49 +1,51 @@
 plugins {
-	kotlin("jvm") version "1.6.21"
-	id("com.jfrog.bintray") version "1.8.4"
-	`maven-publish`
+    kotlin("jvm") version "1.6.21"
+    id("com.jfrog.bintray") version "1.8.4"
+    `maven-publish`
 }
 
-group = "com.jacobtread.xml"
+group = "com.jacobtread"
 version = "1.0.0"
 
 
+
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 val kotlinVersion: String = "1.6.21"
 
 tasks {
-	val jar by getting(Jar::class)
+    val jar by getting(Jar::class)
 
-	register<Jar>("sourceJar") {
-		from(sourceSets["main"].allSource)
-		destinationDirectory.set(jar.destinationDirectory)
-		archiveClassifier.set("sources")
-	}
+    register<Jar>("sourceJar") {
+        from(sourceSets["main"].allSource)
+        destinationDirectory.set(jar.destinationDirectory)
+        archiveClassifier.set("sources")
+    }
 }
 
 dependencies {
-	compileOnly(kotlin("stdlib", kotlinVersion))
-	compileOnly(kotlin("reflect", kotlinVersion))
-	testImplementation("junit:junit:4.12")
-	testImplementation(kotlin("reflect", kotlinVersion))
-	testImplementation(kotlin("test-junit", kotlinVersion))
+    compileOnly(kotlin("stdlib", kotlinVersion))
+    compileOnly(kotlin("reflect", kotlinVersion))
+    testImplementation("junit:junit:4.12")
+    testImplementation(kotlin("reflect", kotlinVersion))
+    testImplementation(kotlin("test-junit", kotlinVersion))
 }
 
 artifacts {
-	add("archives", tasks["sourceJar"])
+    add("archives", tasks["sourceJar"])
 }
 
 publishing {
-	publications {
-		register<MavenPublication>("maven") {
-			from(components["java"])
+    publications {
+        register<MavenPublication>("maven") {
+            artifactId = "xml"
+            from(components["kotlin"])
 
-			artifact(tasks["sourceJar"]) {
-				classifier = "sources"
-			}
-		}
-	}
+            artifact(tasks["sourceJar"]) {
+                classifier = "sources"
+            }
+        }
+    }
 }
