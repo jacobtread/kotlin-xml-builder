@@ -1,17 +1,49 @@
 plugins {
-	kotlin("jvm") version "1.6.21" apply false
-	id("com.jfrog.bintray") version "1.8.4" apply false
-	id("com.bmuschko.nexus") version "2.3.1" apply false
-	jacoco
+	kotlin("jvm") version "1.6.21"
+	id("com.jfrog.bintray") version "1.8.4"
+	`maven-publish`
 }
 
-extra["kotlinVersion"] = "1.6.21"
+group = "com.jacobtread.xml"
+version = "1.0.0"
 
-allprojects {
-	group = "org.redundent"
-	version = "1.7.4"
 
-	repositories {
-		mavenCentral()
+repositories {
+	mavenCentral()
+}
+
+val kotlinVersion: String = "1.6.21"
+
+tasks {
+	val jar by getting(Jar::class)
+
+	register<Jar>("sourceJar") {
+		from(sourceSets["main"].allSource)
+		destinationDirectory.set(jar.destinationDirectory)
+		archiveClassifier.set("sources")
+	}
+}
+
+dependencies {
+	compileOnly(kotlin("stdlib", kotlinVersion))
+	compileOnly(kotlin("reflect", kotlinVersion))
+	testImplementation("junit:junit:4.12")
+	testImplementation(kotlin("reflect", kotlinVersion))
+	testImplementation(kotlin("test-junit", kotlinVersion))
+}
+
+artifacts {
+	add("archives", tasks["sourceJar"])
+}
+
+publishing {
+	publications {
+		register<MavenPublication>("maven") {
+			from(components["java"])
+
+			artifact(tasks["sourceJar"]) {
+				classifier = "sources"
+			}
+		}
 	}
 }
