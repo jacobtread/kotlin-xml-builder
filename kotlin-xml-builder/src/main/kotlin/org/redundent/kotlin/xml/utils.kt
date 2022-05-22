@@ -2,11 +2,9 @@ package org.redundent.kotlin.xml
 
 internal fun escapeValue(value: Any?, xmlVersion: XmlVersion, useCharacterReference: Boolean = false): String? {
     val asString = value?.toString() ?: return null
-
     if (useCharacterReference) {
         return referenceCharacter(asString)
     }
-
     return when (xmlVersion) {
         XmlVersion.V10 -> escapeXml10(asString)
         XmlVersion.V11 -> escapeXml11(asString)

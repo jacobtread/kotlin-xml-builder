@@ -57,7 +57,7 @@ open class Node(val nodeName: String) : Element {
 
     private var doctype: Doctype? = null
 
-    val _children = ArrayList<Element>()
+    val children = ArrayList<Element>()
 
     private val childOrderMap: Map<String, Int>? by lazy {
         if (!isReflectionAvailable) {
@@ -72,18 +72,15 @@ open class Node(val nodeName: String) : Element {
         childOrder.indices.associateBy { childOrder[it] }
     }
 
-    val children: List<Element>
-        get() = _children
-
 
     private fun <T : Element> initTag(tag: T): T {
-        _children.add(tag)
+        children.add(tag)
         return tag
     }
 
     private fun <T : Element> initTag(tag: T, init: T.() -> Unit): T {
         tag.init()
-        _children.add(tag)
+        children.add(tag)
         return tag
     }
 
@@ -123,10 +120,10 @@ open class Node(val nodeName: String) : Element {
 
         if (!isEmptyOrSingleEmptyTextElement()) {
             if (printOptions.pretty && printOptions.singleLineTextElements
-                && _children.size == 1 && _children[0] is TextElement
+                && children.size == 1 && children[0] is TextElement
             ) {
                 builder.append(">")
-                (_children[0] as TextElement).renderSingleLine(builder, printOptions)
+                (children[0] as TextElement).renderSingleLine(builder, printOptions)
                 builder.append("</$nodeName>$lineEnding")
             } else {
                 builder.append(">$lineEnding")
@@ -142,12 +139,12 @@ open class Node(val nodeName: String) : Element {
     }
 
     private fun isEmptyOrSingleEmptyTextElement(): Boolean {
-        if (_children.isEmpty()) {
+        if (children.isEmpty()) {
             return true
         }
 
-        if (_children.size == 1 && _children[0] is TextElement) {
-            return (_children[0] as TextElement).text.isEmpty()
+        if (children.size == 1 && children[0] is TextElement) {
+            return (children[0] as TextElement).text.isEmpty()
         }
 
         return false
@@ -160,9 +157,9 @@ open class Node(val nodeName: String) : Element {
 
     private fun sortedChildren(): List<Element> {
         return if (childOrderMap == null) {
-            _children
+            children
         } else {
-            _children.sortedWith { a, b ->
+            children.sortedWith { a, b ->
                 val indexA = if (a is Node) childOrderMap!![a.nodeName] else 0
                 val indexB = if (b is Node) childOrderMap!![b.nodeName] else 0
 
@@ -226,7 +223,7 @@ open class Node(val nodeName: String) : Element {
     operator fun String.unaryMinus() = text(this)
 
     fun text(text: String) {
-        _children.add(TextElement(text))
+        children.add(TextElement(text))
     }
 
     /**
@@ -238,7 +235,7 @@ open class Node(val nodeName: String) : Element {
      * @param text The text of the comment. This text will be rendenered unescaped except for replace "--" with "&#45;&#45;"]
      */
     fun comment(text: String) {
-        _children.add(Comment(text))
+        children.add(Comment(text))
     }
 
     /**
@@ -253,7 +250,7 @@ open class Node(val nodeName: String) : Element {
      */
     fun element(name: String): Node {
         val node = Node(name)
-        _children.add(node)
+        children.add(node)
         return node
     }
 
@@ -362,7 +359,7 @@ open class Node(val nodeName: String) : Element {
      * @param text The inner text of the CDATA element.
      */
     fun cdata(text: String) {
-        _children.add(CDATAElement(text))
+        children.add(CDATAElement(text))
     }
 
     /**
@@ -372,7 +369,7 @@ open class Node(val nodeName: String) : Element {
      * @param attributes Optional set of attributes to apply to this processing instruction.
      */
     fun processingInstruction(text: String, vararg attributes: Pair<String, String>) {
-        _children.add(ProcessingInstructionElement(text, linkedMapOf(*attributes)))
+        children.add(ProcessingInstructionElement(text, linkedMapOf(*attributes)))
     }
 
 
@@ -421,7 +418,7 @@ open class Node(val nodeName: String) : Element {
      * @param node The node to append.
      */
     fun addNode(node: Node) {
-        _children.add(node)
+        children.add(node)
     }
 
     /**
@@ -433,10 +430,10 @@ open class Node(val nodeName: String) : Element {
      */
     fun addNodeAfter(node: Node, after: Node) {
         val index = findIndex(after)
-        if (index + 1 == _children.size) {
-            _children.add(node)
+        if (index + 1 == children.size) {
+            children.add(node)
         } else {
-            _children.add(index + 1, node)
+            children.add(index + 1, node)
         }
     }
 
@@ -448,7 +445,7 @@ open class Node(val nodeName: String) : Element {
      * @throws IllegalArgumentException If [before] can't be found
      */
     fun addNodeBefore(node: Node, before: Node) {
-        _children.add(findIndex(before), node)
+        children.add(findIndex(before), node)
     }
 
     /**
@@ -459,7 +456,7 @@ open class Node(val nodeName: String) : Element {
      */
     fun removeNode(node: Node) {
         val index = findIndex(node)
-        _children.removeAt(index)
+        children.removeAt(index)
     }
 
     /**
@@ -472,8 +469,8 @@ open class Node(val nodeName: String) : Element {
     fun replaceNode(existing: Node, newNode: Node) {
         val index = findIndex(existing)
 
-        _children.removeAt(index)
-        _children.add(index, newNode)
+        children.removeAt(index)
+        children.add(index, newNode)
     }
 
     /**
@@ -496,7 +493,7 @@ open class Node(val nodeName: String) : Element {
      * Returns the first element matching the given [predicate].
      * @throws [NoSuchElementException] if no such element is found.
      */
-    fun first(predicate: (Element) -> Boolean): Element = _children.first(predicate)
+    fun first(predicate: (Element) -> Boolean): Element = children.first(predicate)
 
     /**
      * Returns the first element whose nodeName matches [name], or `null` if element was not found.
@@ -506,7 +503,7 @@ open class Node(val nodeName: String) : Element {
     /**
      * Returns the first element matching the given [predicate], or `null` if element was not found.
      */
-    fun firstOrNull(predicate: (Element) -> Boolean): Element? = _children.firstOrNull(predicate)
+    fun firstOrNull(predicate: (Element) -> Boolean): Element? = children.firstOrNull(predicate)
 
     /**
      * Returns `true` if at least one element's nodeName matches [name].
@@ -516,16 +513,15 @@ open class Node(val nodeName: String) : Element {
     /**
      * Returns `true` if at least one element matches the given [predicate].
      */
-    fun exists(predicate: (Element) -> Boolean): Boolean = _children.any(predicate)
+    fun exists(predicate: (Element) -> Boolean): Boolean = children.any(predicate)
 
-    private fun filterChildrenToNodes(): List<Node> = _children.filterIsInstance(Node::class.java)
+    private fun filterChildrenToNodes(): List<Node> = children.filterIsInstance(Node::class.java)
 
     private fun findIndex(node: Node): Int {
-        val index = _children.indexOf(node)
+        val index = children.indexOf(node)
         if (index == -1) {
             throw IllegalArgumentException("Node with nodeName '${node.nodeName}' is not a child of '$nodeName'")
         }
-
         return index
     }
 
@@ -537,7 +533,7 @@ open class Node(val nodeName: String) : Element {
         if (version != other.version) return false
         if (attributes != other.attributes) return false
         if (_globalLevelProcessingInstructions != other._globalLevelProcessingInstructions) return false
-        if (_children != other._children) return false
+        if (children != other.children) return false
         return true
     }
 
@@ -547,7 +543,7 @@ open class Node(val nodeName: String) : Element {
         result = 31 * result + version.hashCode()
         result = 31 * result + attributes.hashCode()
         result = 31 * result + _globalLevelProcessingInstructions.hashCode()
-        result = 31 * result + _children.hashCode()
+        result = 31 * result + children.hashCode()
         return result
     }
 }
