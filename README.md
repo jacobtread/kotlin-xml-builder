@@ -1,3 +1,4 @@
+
 ![CI](https://github.com/redundent/kotlin-xml-builder/workflows/CI/badge.svg)
 [![Download](https://maven-badges.herokuapp.com/maven-central/org.redundent/kotlin-xml-builder/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.redundent/kotlin-xml-builder)
 
@@ -9,6 +10,10 @@ It is based on the HTML builder described in the [Kotlin docs](https://kotlinlan
 
 It is designed to be lightweight and fast. There isn't any validation except to 
 escape text to not violate xml standards.
+
+## Credits
+Forked from [https://github.com/redundent/kotlin-xml-builder](https://github.com/redundent/kotlin-xml-builder) to update to the lastest
+version of kotlin, inling, and modifications etc to make it easier to use / better
 
 License
 -
